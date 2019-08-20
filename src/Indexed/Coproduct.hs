@@ -12,7 +12,7 @@
 -- Indexed functor coproducts
 -----------------------------------------------------------------------------
 module Indexed.Coproduct
-  ( (+)(InL,InR)
+  ( type (+)(InL,InR)
   ) where
 
 import Control.Applicative

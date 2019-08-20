@@ -1,3 +1,4 @@
+{-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeOperators #-}
@@ -19,9 +20,9 @@
 -----------------------------------------------------------------------------
 module Indexed.Constraints
   ( Dict(Dict)
-  , (|-)(Sub)
+  , type (|-) (Sub)
   , Class(byClass)
-  , (|=)(byInstance)
+  , type (|=)(byInstance)
   , (\\)
   ) where
 

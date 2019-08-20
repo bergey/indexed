@@ -1,3 +1,4 @@
+{-# LANGUAGE ExplicitNamespaces #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
@@ -21,7 +22,7 @@
 module Indexed.Types
   (
   -- * Natural Transformations
-    (~>)()
+    type (~>)()
   , (:~>)(Nat,($$))
   -- * Limits
   , Lim
@@ -38,7 +39,7 @@ module Indexed.Types
   -- * Type Equality
   , module Data.Type.Equality
   -- * Type Application
-  , ($)()
+  , type ($)()
   ) where
 
 import Control.Category
