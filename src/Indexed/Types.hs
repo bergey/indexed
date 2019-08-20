@@ -62,9 +62,12 @@ infixr 0 :~>, $$
 newtype f :~> g = Nat { ($$) :: f ~> g }
   deriving Typeable
 
+instance f ~ g => Semigroup (f :~> g) where
+    Nat f <> Nat g = Nat (f . g)
+
 instance f ~ g => Monoid (f :~> g) where
   mempty = Nat id
-  mappend (Nat f) (Nat g) = Nat (f . g)
+
 
 -- | A limit.
 type Lim (f :: i -> *) = forall (x :: i). f x
@@ -105,7 +108,7 @@ derp = unsafeCoerce
 -- Atkey
 -------------------------------------------------------------------------------
 
-data At :: * -> k -> k -> * where 
+data At :: * -> k -> k -> * where
   At :: a -> At a k k
  deriving Typeable
 
@@ -133,14 +136,16 @@ instance Monoid m => Category (At m) where
   id          = At mempty
   At m . At n = At (m <> n)
 
+instance (Semigroup m, i ~ j) => Semigroup (At m i j) where
+  At m <> At n = At (m <> n)
+
 instance (Monoid m, i ~ j) => Monoid (At m i j) where
   mempty              = At mempty
-  At m `mappend` At n = At (mappend m n)
 
 -- | Type alias for indexed monads, functors, etc. in Bob Atkey's style.
 type Atkey f i j a = f (At a j) i
 
-instance (Data a, Typeable i, i ~ j) => Data (At a i j) where
+instance forall k (i :: k) j a. (Data a, Typeable k, Typeable i, i ~ j) => Data (At a i j) where
   gfoldl f z (At a) = z At `f` a
   toConstr _ = atConstr
   gunfold k z c = case constrIndex c of
@@ -179,11 +184,13 @@ instance (Eq a, i ~ j) => Eq (Coat a i j) where
 instance (Ord a, i ~ j) => Ord (Coat a i j) where
   Coat m `compare` Coat n = compare m n
 
+instance Semigroup m => Semigroup (Coat m i j) where
+  m <> n = Coat (case m of
+    Coat a -> case n of
+      Coat b -> a <> b)
+
 instance Monoid m => Monoid (Coat m i j) where
   mempty      = Coat mempty
-  mappend m n = Coat (case m of
-    Coat a -> case n of
-      Coat b -> mappend a b)
 
 uncoat :: Coat a i i -> a
 uncoat (Coat a) = a
@@ -191,7 +198,7 @@ uncoat (Coat a) = a
 -- | Type alias for indexed monads, functors, etc. in Bob Atkey's style.
 type Coatkey f i j a = f (Coat a j) i
 
-instance (Data a, Typeable i, i ~ j) => Data (Coat a i j) where
+instance forall k (i :: k) j a. (Data a, Typeable k, Typeable i, i ~ j) => Data (Coat a i j) where
   gfoldl f z (Coat a) = z (\x -> Coat x) `f` a
   toConstr _ = coatConstr
   gunfold k z c = case constrIndex c of
@@ -214,4 +221,3 @@ coatDataType = mkDataType "Indexed.Types.Coat" [coatConstr]
 infixr 0 $
 -- | A type level version of @('$')@, useful to avoid parentheses
 type ($) a = a
-
